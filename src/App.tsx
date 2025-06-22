@@ -7,8 +7,6 @@ import ProtectedRoute from './components/ProtectedRoute'
 import LoadingSpinner from './components/LoadingSpinner'
 import ErrorBoundary from './components/ErrorBoundary'
 import { ToastProvider } from './components/Toast'
-
-// Lazy load pages for better performance
 const LandingPage = lazy(() => import('./pages/LandingPage'))
 const Dashboard = lazy(() => import('./pages/Dashboard'))
 const AddMeal = lazy(() => import('./pages/AddMeal'))
@@ -17,12 +15,8 @@ const ProfileSimple = lazy(() => import('./pages/ProfileSimple'))
 const Challenges = lazy(() => import('./pages/Challenges'))
 const ChallengeProgress = lazy(() => import('./pages/ChallengeProgress'))
 const Leaderboard = lazy(() => import('./pages/Leaderboard'))
-
-// Component to conditionally render Footer only on homepage
 function ConditionalFooter() {
   const location = useLocation()
-
-  // Only show footer on the homepage (landing page)
   if (location.pathname === '/') {
     return <Footer />
   }

@@ -12,7 +12,7 @@ import {
   updatePassword,
   type User
 } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth, getFirebaseStatus } from '../config/firebase';
 
 export interface UserProfile {
   uid: string;
@@ -27,6 +27,18 @@ class AuthService {
   private googleProvider: GoogleAuthProvider;
 
   constructor() {
+    // Check Firebase initialization status
+    const firebaseStatus = getFirebaseStatus();
+
+    if (!firebaseStatus.isInitialized) {
+      console.warn('⚠️ Firebase not initialized:', firebaseStatus.error);
+      console.warn('⚠️ AuthService will have limited functionality');
+    }
+
+    if (!auth) {
+      console.warn('⚠️ Firebase Auth not available');
+    }
+
     // Initialize Google provider with proper configuration
     this.googleProvider = new GoogleAuthProvider();
 
@@ -44,6 +56,10 @@ class AuthService {
 
   // Sign up with email and password
   async signUp(email: string, password: string, displayName: string): Promise<User> {
+    if (!auth) {
+      throw new Error('Firebase Auth is not available. Please check your configuration.');
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -60,6 +76,10 @@ class AuthService {
 
   // Sign in with email and password
   async signIn(email: string, password: string): Promise<User> {
+    if (!auth) {
+      throw new Error('Firebase Auth is not available. Please check your configuration.');
+    }
+
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
