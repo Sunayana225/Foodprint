@@ -201,7 +201,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## 📧 Contact
 
 - Project Link: [https://github.com/Sunayana225/Foodprint](https://github.com/Sunayana225/Foodprint)
-- Website: [https://foodprint-app.vercel.app](https://foodprint-app.vercel.app)
+- Website: [foodprint-five.vercel.app](foodprint-five.vercel.app)
 
 ---
 
