@@ -7,7 +7,6 @@ FoodPrint is a modern, interactive web application designed to help users track 
 foodprint-five.vercel.app  
 
 ![FoodPrint App](![image](https://github.com/user-attachments/assets/9c209a72-662e-408b-956b-17ee00040ad3))
-
 ## 🌍 Why FoodPrint?
 
 Food production is responsible for approximately 26% of global greenhouse gas emissions. By making informed choices about what we eat, we can significantly reduce our individual environmental footprint. FoodPrint makes this possible by:
