@@ -352,14 +352,35 @@ const RecipeGeneratorSimple = () => {
                   </div>
                 </div>
 
-                {/* Generate Another Recipe Button */}
-                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+                {/* Action Buttons */}
+                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200 space-y-3">
                   <button
-                    onClick={() => setGeneratedRecipe(null)}
-                    className="w-full px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-medium flex items-center justify-center space-x-2"
+                    onClick={generateRecipe}
+                    disabled={isGenerating}
+                    className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <Sparkles className="h-5 w-5" />
-                    <span>Generate Another Recipe</span>
+                    {isGenerating ? (
+                      <>
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-5 w-5" />
+                        <span>Generate Another Recipe</span>
+                      </>
+                    )}
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setGeneratedRecipe(null)
+                      setIsFromEcoWarning(false)
+                    }}
+                    className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium flex items-center justify-center space-x-2"
+                  >
+                    <Plus className="h-5 w-5" />
+                    <span>Start Fresh</span>
                   </button>
                 </div>
               </div>

@@ -983,12 +983,14 @@ class FoodService {
     }
   }
 
-  // Generate recipe suggestions
+  // Generate recipe suggestions with variety
   async generateRecipe(ingredients: string[]): Promise<Recipe> {
-    const recipeData = this.createIntelligentRecipe(ingredients)
+    // Add randomness to create different recipes each time
+    const recipeVariation = Math.floor(Math.random() * 3) // 0, 1, or 2
+    const recipeData = this.createIntelligentRecipe(ingredients, recipeVariation)
 
     const recipe: Recipe = {
-      id: Date.now().toString(),
+      id: Date.now().toString() + '_' + recipeVariation,
       title: recipeData.title,
       ingredients: recipeData.ingredients,
       instructions: recipeData.instructions,
@@ -1004,7 +1006,7 @@ class FoodService {
     return recipe
   }
 
-  private createIntelligentRecipe(ingredients: string[]) {
+  private createIntelligentRecipe(ingredients: string[], variation: number = 0) {
     // Analyze ingredients to determine recipe type
     const hasProtein = ingredients.some(ing =>
       ing.toLowerCase().includes('chicken') ||
@@ -1030,21 +1032,37 @@ class FoodService {
       ing.toLowerCase().includes('turmeric')
     )
 
-    // Determine recipe type and generate accordingly
+    // Create different recipe variations based on the same ingredients
+    const recipeTypes = []
+
     if (hasProtein && hasRice && hasVegetables && hasIndianSpices) {
-      return this.generateIndianCurryRecipe(ingredients)
+      recipeTypes.push(() => this.generateIndianCurryRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateBiryaniRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generatePulaoRecipe(ingredients, variation))
     } else if (hasProtein && hasVegetables) {
-      return this.generateStirFryRecipe(ingredients)
+      recipeTypes.push(() => this.generateStirFryRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateGrilledRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateSoupRecipe(ingredients, variation))
     } else if (hasVegetables && hasRice) {
-      return this.generateVegetableRiceRecipe(ingredients)
+      recipeTypes.push(() => this.generateVegetableRiceRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateRisottoRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateRiceBowlRecipe(ingredients, variation))
     } else if (hasVegetables) {
-      return this.generateVegetableSaladRecipe(ingredients)
+      recipeTypes.push(() => this.generateVegetableSaladRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateVegetableCurryRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateRoastedVegetableRecipe(ingredients, variation))
     } else {
-      return this.generateSimpleBowlRecipe(ingredients)
+      recipeTypes.push(() => this.generateSimpleBowlRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateSmoothieBowlRecipe(ingredients, variation))
+      recipeTypes.push(() => this.generateHealthyMixRecipe(ingredients, variation))
     }
+
+    // Select recipe type based on variation
+    const selectedRecipeType = recipeTypes[variation % recipeTypes.length]
+    return selectedRecipeType()
   }
 
-  private generateIndianCurryRecipe(ingredients: string[]) {
+  private generateIndianCurryRecipe(ingredients: string[], variation: number = 0) {
     const protein = ingredients.find(ing =>
       ing.toLowerCase().includes('chicken') ||
       ing.toLowerCase().includes('paneer') ||
@@ -1099,7 +1117,7 @@ class FoodService {
     }
   }
 
-  private generateStirFryRecipe(ingredients: string[]) {
+  private generateStirFryRecipe(ingredients: string[], variation: number = 0) {
     const protein = ingredients.find(ing =>
       ing.toLowerCase().includes('chicken') ||
       ing.toLowerCase().includes('tofu') ||
@@ -1147,7 +1165,7 @@ class FoodService {
     }
   }
 
-  private generateVegetableRiceRecipe(ingredients: string[]) {
+  private generateVegetableRiceRecipe(ingredients: string[], variation: number = 0) {
     return {
       title: 'Vegetable Fried Rice',
       ingredients: [
@@ -1186,7 +1204,7 @@ class FoodService {
     }
   }
 
-  private generateVegetableSaladRecipe(ingredients: string[]) {
+  private generateVegetableSaladRecipe(ingredients: string[], variation: number = 0) {
     return {
       title: 'Fresh Garden Salad',
       ingredients: [
@@ -1220,28 +1238,387 @@ class FoodService {
     }
   }
 
-  private generateSimpleBowlRecipe(ingredients: string[]) {
+  private generateSimpleBowlRecipe(ingredients: string[], variation: number = 0) {
+    const cookingMethods = ['Roasted', 'Grilled', 'Steamed']
+    const method = cookingMethods[variation % cookingMethods.length]
+
     return {
-      title: `Healthy ${ingredients.join(' & ')} Bowl`,
+      title: `Healthy ${method} ${ingredients.join(' & ')} Bowl`,
       ingredients: [
         ...ingredients.map(ing => `1 cup ${ing.toLowerCase()}`),
         '2 tbsp olive oil',
         '1 tsp garlic powder',
         'Salt and pepper to taste',
-        'Fresh herbs for garnish'
+        'Fresh herbs for garnish',
+        variation === 0 ? 'Lemon juice for drizzling' : variation === 1 ? 'Balsamic glaze' : 'Tahini sauce'
       ],
       instructions: [
-        'Preheat oven to 400°F (200°C)',
+        variation === 0 ? 'Preheat oven to 400°F (200°C)' : variation === 1 ? 'Preheat grill to medium-high heat' : 'Prepare steamer basket',
         'Prepare all ingredients by washing and chopping appropriately',
         'Toss ingredients with olive oil and seasonings',
-        'Roast in oven for 20-25 minutes until tender',
+        variation === 0 ? 'Roast in oven for 20-25 minutes until tender' :
+        variation === 1 ? 'Grill for 15-20 minutes, turning occasionally' :
+        'Steam for 12-15 minutes until tender',
+        'Arrange in bowls and drizzle with finishing sauce',
         'Serve hot with fresh herbs',
         'Enjoy your healthy, eco-friendly meal!'
       ],
       prepTime: 15,
-      cookTime: 25,
+      cookTime: variation === 2 ? 15 : 25,
       servings: 4,
       image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400'
+    }
+  }
+
+  // New recipe variations
+  private generateBiryaniRecipe(ingredients: string[], variation: number = 0) {
+    const protein = ingredients.find(ing =>
+      ing.toLowerCase().includes('chicken') ||
+      ing.toLowerCase().includes('paneer') ||
+      ing.toLowerCase().includes('tofu')
+    ) || 'vegetables'
+
+    return {
+      title: `Fragrant ${protein.charAt(0).toUpperCase() + protein.slice(1)} Biryani`,
+      ingredients: [
+        '2 cups basmati rice, soaked for 30 minutes',
+        `500g ${protein.toLowerCase()}, cut into pieces`,
+        '1 cup yogurt',
+        '2 large onions, thinly sliced',
+        '1/4 cup ghee or oil',
+        '1 tsp cumin seeds',
+        '4-5 green cardamom pods',
+        '2 bay leaves',
+        '1 inch cinnamon stick',
+        '1 tsp ginger-garlic paste',
+        '1/2 tsp turmeric powder',
+        '1 tsp red chili powder',
+        '1 tsp biryani masala',
+        'Saffron soaked in 1/4 cup warm milk',
+        'Fresh mint and coriander leaves',
+        'Salt to taste'
+      ],
+      instructions: [
+        'Marinate protein with yogurt, turmeric, chili powder, and salt for 30 minutes',
+        'Heat ghee in a heavy-bottomed pot, fry onions until golden brown',
+        'Remove half the onions and set aside for garnish',
+        'Add whole spices to remaining onions, cook for 1 minute',
+        'Add marinated protein and cook until 70% done',
+        'In another pot, boil water with whole spices and salt',
+        'Add soaked rice and cook until 70% done, then drain',
+        'Layer the rice over protein, sprinkle fried onions, herbs, and saffron milk',
+        'Cover with foil, then lid, and cook on high heat for 3-4 minutes',
+        'Reduce heat to low and cook for 45 minutes',
+        'Let it rest for 10 minutes before opening',
+        'Gently mix and serve hot with raita and pickle'
+      ],
+      prepTime: 45,
+      cookTime: 60,
+      servings: 6,
+      image: 'https://images.unsplash.com/photo-1563379091339-03246963d96c?w=400'
+    }
+  }
+
+  private generateGrilledRecipe(ingredients: string[], variation: number = 0) {
+    const protein = ingredients.find(ing =>
+      ing.toLowerCase().includes('chicken') ||
+      ing.toLowerCase().includes('fish') ||
+      ing.toLowerCase().includes('tofu')
+    ) || 'vegetables'
+
+    const marinades = ['Mediterranean', 'Asian', 'Mexican']
+    const marinade = marinades[variation % marinades.length]
+
+    return {
+      title: `${marinade} Grilled ${protein.charAt(0).toUpperCase() + protein.slice(1)}`,
+      ingredients: [
+        `600g ${protein.toLowerCase()}, cut into portions`,
+        marinade === 'Mediterranean' ? '1/4 cup olive oil' : marinade === 'Asian' ? '2 tbsp sesame oil' : '2 tbsp vegetable oil',
+        marinade === 'Mediterranean' ? '2 tbsp lemon juice' : marinade === 'Asian' ? '3 tbsp soy sauce' : '2 tbsp lime juice',
+        marinade === 'Mediterranean' ? '2 tsp dried oregano' : marinade === 'Asian' ? '1 tbsp honey' : '1 tsp cumin powder',
+        marinade === 'Mediterranean' ? '3 cloves garlic, minced' : marinade === 'Asian' ? '2 cloves garlic, minced' : '2 cloves garlic, minced',
+        marinade === 'Mediterranean' ? 'Fresh rosemary' : marinade === 'Asian' ? '1 inch ginger, grated' : '1 tsp chili powder',
+        ...ingredients.filter(ing => !ing.toLowerCase().includes(protein.toLowerCase())).map(veg => `2 cups ${veg.toLowerCase()}, cut for grilling`),
+        'Salt and pepper to taste'
+      ],
+      instructions: [
+        `Mix all marinade ingredients in a bowl`,
+        `Marinate ${protein.toLowerCase()} for at least 30 minutes`,
+        'Preheat grill to medium-high heat',
+        'Remove protein from marinade and season with salt and pepper',
+        `Grill ${protein.toLowerCase()} for 6-8 minutes per side until cooked through`,
+        'Grill vegetables for 4-6 minutes until tender and slightly charred',
+        'Let protein rest for 5 minutes before serving',
+        'Serve hot with grilled vegetables',
+        'Garnish with fresh herbs and enjoy!'
+      ],
+      prepTime: 40,
+      cookTime: 20,
+      servings: 4,
+      image: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=400'
+    }
+  }
+
+  // Additional recipe variations for more variety
+  private generatePulaoRecipe(ingredients: string[], variation: number = 0) {
+    return {
+      title: 'Aromatic Vegetable Pulao',
+      ingredients: [
+        '2 cups basmati rice, soaked',
+        '3 tbsp ghee or oil',
+        '1 tsp cumin seeds',
+        '2 bay leaves',
+        '4 green cardamom pods',
+        '1 inch cinnamon stick',
+        '1 large onion, sliced',
+        ...ingredients.filter(ing => !ing.toLowerCase().includes('rice')).map(veg => `1 cup ${veg.toLowerCase()}, chopped`),
+        '3 cups vegetable broth',
+        '1 tsp garam masala',
+        'Salt to taste',
+        'Fresh mint leaves'
+      ],
+      instructions: [
+        'Heat ghee in a heavy-bottomed pot',
+        'Add whole spices and let them splutter',
+        'Add sliced onions and sauté until golden',
+        'Add vegetables and cook for 5 minutes',
+        'Add drained rice and gently mix',
+        'Add hot broth and bring to a boil',
+        'Add garam masala and salt',
+        'Cover and cook on low heat for 18-20 minutes',
+        'Let it rest for 5 minutes',
+        'Garnish with mint and serve hot'
+      ],
+      prepTime: 20,
+      cookTime: 25,
+      servings: 4,
+      image: 'https://images.unsplash.com/photo-1596797038530-2c107229654b?w=400'
+    }
+  }
+
+  private generateSoupRecipe(ingredients: string[], variation: number = 0) {
+    const soupTypes = ['Hearty', 'Creamy', 'Spicy']
+    const type = soupTypes[variation % soupTypes.length]
+
+    return {
+      title: `${type} Mixed Vegetable Soup`,
+      ingredients: [
+        ...ingredients.map(ing => `2 cups ${ing.toLowerCase()}, chopped`),
+        '2 tbsp olive oil',
+        '1 large onion, diced',
+        '3 cloves garlic, minced',
+        '6 cups vegetable broth',
+        type === 'Creamy' ? '1/2 cup coconut milk' : type === 'Spicy' ? '1 tsp red pepper flakes' : '1 can diced tomatoes',
+        '1 tsp dried herbs',
+        'Salt and pepper to taste',
+        'Fresh parsley for garnish'
+      ],
+      instructions: [
+        'Heat oil in a large pot over medium heat',
+        'Sauté onion and garlic until fragrant',
+        'Add harder vegetables first and cook for 5 minutes',
+        'Add remaining vegetables and cook for another 5 minutes',
+        'Pour in broth and bring to a boil',
+        'Reduce heat and simmer for 20-25 minutes',
+        type === 'Creamy' ? 'Stir in coconut milk and simmer for 5 more minutes' :
+        type === 'Spicy' ? 'Add red pepper flakes and simmer for 5 more minutes' :
+        'Add diced tomatoes and simmer for 10 more minutes',
+        'Season with herbs, salt, and pepper',
+        'Serve hot garnished with fresh parsley'
+      ],
+      prepTime: 15,
+      cookTime: 35,
+      servings: 6,
+      image: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400'
+    }
+  }
+
+  private generateRisottoRecipe(ingredients: string[], variation: number = 0) {
+    return {
+      title: 'Creamy Vegetable Risotto',
+      ingredients: [
+        '1.5 cups arborio rice',
+        '4 cups warm vegetable broth',
+        '1/2 cup white wine (optional)',
+        '1 large onion, finely diced',
+        '3 cloves garlic, minced',
+        '3 tbsp olive oil',
+        '2 tbsp butter',
+        ...ingredients.filter(ing => !ing.toLowerCase().includes('rice')).map(veg => `1 cup ${veg.toLowerCase()}, diced`),
+        '1/2 cup grated parmesan (optional)',
+        'Fresh herbs for garnish',
+        'Salt and pepper to taste'
+      ],
+      instructions: [
+        'Keep broth warm in a separate pot',
+        'Heat oil and 1 tbsp butter in a large pan',
+        'Sauté onion until translucent',
+        'Add garlic and cook for 1 minute',
+        'Add rice and stir for 2 minutes until lightly toasted',
+        'Add wine if using and stir until absorbed',
+        'Add warm broth one ladle at a time, stirring constantly',
+        'Continue until rice is creamy and al dente (about 20 minutes)',
+        'Stir in vegetables during last 5 minutes',
+        'Finish with remaining butter and parmesan',
+        'Garnish with herbs and serve immediately'
+      ],
+      prepTime: 15,
+      cookTime: 30,
+      servings: 4,
+      image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?w=400'
+    }
+  }
+
+  private generateRiceBowlRecipe(ingredients: string[], variation: number = 0) {
+    return {
+      title: 'Nourishing Buddha Bowl',
+      ingredients: [
+        '2 cups cooked brown rice',
+        ...ingredients.filter(ing => !ing.toLowerCase().includes('rice')).map(veg => `1 cup ${veg.toLowerCase()}`),
+        '3 tbsp tahini or peanut butter',
+        '2 tbsp soy sauce',
+        '1 tbsp honey',
+        '1 tbsp rice vinegar',
+        '1 tsp sesame oil',
+        '1 clove garlic, minced',
+        'Sesame seeds for garnish',
+        'Sliced avocado (optional)'
+      ],
+      instructions: [
+        'Prepare rice according to package instructions',
+        'Steam or lightly sauté vegetables until tender-crisp',
+        'Whisk together tahini, soy sauce, honey, vinegar, sesame oil, and garlic for dressing',
+        'Divide rice among bowls',
+        'Arrange vegetables over rice',
+        'Drizzle with dressing',
+        'Top with sesame seeds and avocado if using',
+        'Serve immediately and enjoy your nutritious bowl'
+      ],
+      prepTime: 20,
+      cookTime: 15,
+      servings: 3,
+      image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400'
+    }
+  }
+
+  private generateVegetableCurryRecipe(ingredients: string[], variation: number = 0) {
+    return {
+      title: 'Spiced Vegetable Curry',
+      ingredients: [
+        ...ingredients.map(veg => `2 cups ${veg.toLowerCase()}, chopped`),
+        '2 tbsp coconut oil',
+        '1 large onion, diced',
+        '3 cloves garlic, minced',
+        '1 inch ginger, grated',
+        '1 can coconut milk',
+        '1 can diced tomatoes',
+        '2 tsp curry powder',
+        '1 tsp turmeric',
+        '1 tsp cumin',
+        'Salt to taste',
+        'Fresh cilantro for garnish'
+      ],
+      instructions: [
+        'Heat coconut oil in a large pot',
+        'Sauté onion until softened',
+        'Add garlic and ginger, cook for 1 minute',
+        'Add spices and cook until fragrant',
+        'Add tomatoes and cook for 5 minutes',
+        'Add vegetables and coconut milk',
+        'Simmer for 20-25 minutes until vegetables are tender',
+        'Season with salt',
+        'Garnish with cilantro and serve with rice'
+      ],
+      prepTime: 15,
+      cookTime: 30,
+      servings: 5,
+      image: 'https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400'
+    }
+  }
+
+  private generateRoastedVegetableRecipe(ingredients: string[], variation: number = 0) {
+    return {
+      title: 'Mediterranean Roasted Vegetables',
+      ingredients: [
+        ...ingredients.map(veg => `3 cups ${veg.toLowerCase()}, cut into chunks`),
+        '1/4 cup olive oil',
+        '3 cloves garlic, minced',
+        '1 tsp dried oregano',
+        '1 tsp dried thyme',
+        '1/2 tsp paprika',
+        'Salt and pepper to taste',
+        'Fresh lemon juice',
+        'Fresh herbs for garnish'
+      ],
+      instructions: [
+        'Preheat oven to 425°F (220°C)',
+        'Cut all vegetables into similar-sized pieces',
+        'Toss vegetables with olive oil, garlic, and spices',
+        'Spread on a large baking sheet in single layer',
+        'Roast for 25-35 minutes until tender and caramelized',
+        'Stir once halfway through cooking',
+        'Drizzle with lemon juice before serving',
+        'Garnish with fresh herbs'
+      ],
+      prepTime: 15,
+      cookTime: 35,
+      servings: 4,
+      image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400'
+    }
+  }
+
+  private generateSmoothieBowlRecipe(ingredients: string[], variation: number = 0) {
+    return {
+      title: 'Energizing Smoothie Bowl',
+      ingredients: [
+        ...ingredients.slice(0, 3).map(ing => `1 cup ${ing.toLowerCase()}`),
+        '1 frozen banana',
+        '1/2 cup plant milk',
+        '1 tbsp chia seeds',
+        '1 tbsp honey or maple syrup',
+        'Granola for topping',
+        'Fresh berries for topping',
+        'Coconut flakes for topping'
+      ],
+      instructions: [
+        'Blend main ingredients with banana and milk until smooth',
+        'Add sweetener to taste',
+        'Pour into a bowl',
+        'Top with granola, berries, and coconut',
+        'Sprinkle with chia seeds',
+        'Serve immediately for best texture'
+      ],
+      prepTime: 10,
+      cookTime: 0,
+      servings: 2,
+      image: 'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=400'
+    }
+  }
+
+  private generateHealthyMixRecipe(ingredients: string[], variation: number = 0) {
+    return {
+      title: 'Power-Packed Healthy Mix',
+      ingredients: [
+        ...ingredients.map(ing => `1.5 cups ${ing.toLowerCase()}`),
+        '2 tbsp olive oil',
+        '1 tbsp balsamic vinegar',
+        '1 tsp honey',
+        '1/2 tsp garlic powder',
+        'Mixed nuts and seeds',
+        'Salt and pepper to taste'
+      ],
+      instructions: [
+        'Prepare all ingredients by washing and chopping',
+        'Whisk together oil, vinegar, honey, and garlic powder',
+        'Toss ingredients with dressing',
+        'Let marinate for 15 minutes',
+        'Top with nuts and seeds',
+        'Serve as a nutritious meal or side dish'
+      ],
+      prepTime: 20,
+      cookTime: 0,
+      servings: 3,
+      image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400'
     }
   }
 
