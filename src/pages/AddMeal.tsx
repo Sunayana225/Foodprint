@@ -173,30 +173,170 @@ const AddMeal = () => {
 
   // Generate eco-friendly recipe using the alternatives
   const generateEcoRecipe = async (ecoIngredients: string[]): Promise<any> => {
-    const recipePrompts = [
-      `Create a delicious and healthy recipe using these eco-friendly ingredients: ${ecoIngredients.join(', ')}`,
-      `Make a sustainable meal with: ${ecoIngredients.slice(0, 5).join(', ')}`,
-      `Design a low-carbon footprint recipe featuring: ${ecoIngredients.join(', ')}`
+    // Basic ingredients that are commonly available and eco-friendly
+    const basicIngredients = [
+      'olive oil', 'garlic', 'onion', 'ginger', 'turmeric', 'cumin', 'coriander',
+      'salt', 'black pepper', 'lemon juice', 'fresh herbs', 'vegetable broth'
     ]
 
-    const randomPrompt = recipePrompts[Math.floor(Math.random() * recipePrompts.length)]
+    // Create a comprehensive recipe based on the eco ingredients
+    const primaryIngredient = ecoIngredients[0] || 'lentils'
+    const secondaryIngredients = ecoIngredients.slice(1, 4)
 
-    // Simulate recipe generation (in a real app, this would call an AI service)
+    // Recipe templates based on primary ingredient
+    const recipeTemplates = {
+      'lentils': {
+        name: 'Hearty Lentil & Vegetable Curry',
+        description: 'A protein-rich, warming curry packed with nutrients and flavor. This sustainable meal provides complete proteins while having minimal environmental impact.',
+        ingredients: [
+          '1 cup red lentils (washed and drained)',
+          '2 cups mixed vegetables (carrots, bell peppers, spinach)',
+          '1 large onion (diced)',
+          '3 cloves garlic (minced)',
+          '1 inch fresh ginger (grated)',
+          '2 tbsp olive oil',
+          '1 tsp turmeric powder',
+          '1 tsp cumin seeds',
+          '1 tsp coriander powder',
+          '2 cups vegetable broth',
+          'Salt and pepper to taste',
+          'Fresh cilantro for garnish',
+          'Lemon juice (1 tbsp)'
+        ],
+        instructions: [
+          'Heat olive oil in a large pot over medium heat',
+          'Add cumin seeds and let them splutter for 30 seconds',
+          'Add diced onions and sauté until golden brown (5-6 minutes)',
+          'Add minced garlic and grated ginger, cook for 1 minute',
+          'Add turmeric and coriander powder, stir for 30 seconds',
+          'Add washed lentils and mixed vegetables, stir well',
+          'Pour in vegetable broth and bring to a boil',
+          'Reduce heat, cover and simmer for 15-20 minutes until lentils are tender',
+          'Season with salt, pepper, and lemon juice',
+          'Garnish with fresh cilantro and serve hot',
+          'Serve with brown rice or whole wheat bread for a complete meal'
+        ]
+      },
+      'chickpeas': {
+        name: 'Mediterranean Chickpea Power Bowl',
+        description: 'A vibrant, nutrient-dense bowl combining protein-rich chickpeas with fresh vegetables and aromatic herbs.',
+        ingredients: [
+          '1.5 cups cooked chickpeas (or 1 can, drained)',
+          '2 cups mixed greens (spinach, arugula)',
+          '1 cucumber (diced)',
+          '2 tomatoes (chopped)',
+          '1 red onion (thinly sliced)',
+          '3 tbsp olive oil',
+          '2 cloves garlic (minced)',
+          '1 tsp dried oregano',
+          '1/2 tsp paprika',
+          '2 tbsp lemon juice',
+          '1/4 cup fresh parsley (chopped)',
+          'Salt and pepper to taste',
+          '2 tbsp tahini or hummus'
+        ],
+        instructions: [
+          'Heat 1 tbsp olive oil in a pan over medium heat',
+          'Add chickpeas, garlic, oregano, and paprika',
+          'Sauté for 5-7 minutes until chickpeas are lightly crispy',
+          'Season with salt and pepper, set aside',
+          'In a large bowl, combine mixed greens, cucumber, tomatoes, and red onion',
+          'Whisk together remaining olive oil, lemon juice, and a pinch of salt',
+          'Toss vegetables with the dressing',
+          'Top with seasoned chickpeas',
+          'Drizzle with tahini or add a dollop of hummus',
+          'Garnish with fresh parsley',
+          'Serve immediately as a complete, satisfying meal'
+        ]
+      },
+      'tofu': {
+        name: 'Asian-Inspired Crispy Tofu Stir-Fry',
+        description: 'A delicious plant-based meal with crispy tofu and colorful vegetables in a savory sauce.',
+        ingredients: [
+          '400g firm tofu (cubed)',
+          '2 cups mixed vegetables (broccoli, bell peppers, snap peas)',
+          '2 tbsp sesame oil',
+          '3 cloves garlic (minced)',
+          '1 inch fresh ginger (grated)',
+          '2 tbsp soy sauce (low sodium)',
+          '1 tbsp rice vinegar',
+          '1 tsp honey or maple syrup',
+          '1 tsp cornstarch',
+          '2 green onions (sliced)',
+          '1 tbsp sesame seeds',
+          'Red pepper flakes (optional)',
+          'Brown rice for serving'
+        ],
+        instructions: [
+          'Press tofu to remove excess water, then cube into bite-sized pieces',
+          'Heat 1 tbsp sesame oil in a large pan or wok over medium-high heat',
+          'Add tofu cubes and cook until golden and crispy on all sides (8-10 minutes)',
+          'Remove tofu and set aside',
+          'In the same pan, add remaining oil and mixed vegetables',
+          'Stir-fry vegetables for 4-5 minutes until tender-crisp',
+          'Add garlic and ginger, cook for 1 minute',
+          'Mix soy sauce, rice vinegar, honey, and cornstarch in a small bowl',
+          'Return tofu to pan, pour sauce over everything',
+          'Toss everything together for 2-3 minutes until sauce thickens',
+          'Garnish with green onions and sesame seeds',
+          'Serve over brown rice for a complete meal'
+        ]
+      }
+    }
+
+    // Select appropriate template or create a custom one
+    let selectedTemplate = recipeTemplates[primaryIngredient as keyof typeof recipeTemplates]
+
+    if (!selectedTemplate) {
+      // Create a custom recipe for other ingredients
+      selectedTemplate = {
+        name: `Healthy ${primaryIngredient.charAt(0).toUpperCase() + primaryIngredient.slice(1)} Bowl`,
+        description: `A nutritious and sustainable meal featuring ${primaryIngredient} with fresh vegetables and aromatic spices.`,
+        ingredients: [
+          `2 cups ${primaryIngredient}`,
+          ...secondaryIngredients.map(ing => `1 cup ${ing}`),
+          '2 tbsp olive oil',
+          '1 onion (diced)',
+          '2 cloves garlic (minced)',
+          '1 tsp cumin powder',
+          '1 tsp turmeric',
+          'Salt and pepper to taste',
+          'Fresh herbs for garnish',
+          'Lemon juice (1 tbsp)'
+        ],
+        instructions: [
+          'Heat olive oil in a large pan over medium heat',
+          'Add diced onion and cook until softened (5 minutes)',
+          'Add garlic, cumin, and turmeric, cook for 1 minute',
+          `Add ${primaryIngredient} and other vegetables`,
+          'Cook for 10-15 minutes until tender',
+          'Season with salt, pepper, and lemon juice',
+          'Garnish with fresh herbs and serve hot'
+        ]
+      }
+    }
+
     return {
-      name: `Eco-Friendly ${ecoIngredients[0]} Bowl`,
-      description: `A sustainable and delicious meal featuring ${ecoIngredients.slice(0, 3).join(', ')} with minimal environmental impact.`,
-      ingredients: ecoIngredients.slice(0, 6),
-      instructions: [
-        `Prepare ${ecoIngredients[0]} as the base ingredient`,
-        `Add ${ecoIngredients[1]} and ${ecoIngredients[2]} for flavor and nutrition`,
-        `Season with herbs and spices`,
-        `Cook using energy-efficient methods`,
-        `Serve fresh and enjoy your eco-friendly meal!`
+      ...selectedTemplate,
+      cookingTime: '25-35 minutes',
+      prepTime: '10-15 minutes',
+      servings: 3,
+      difficulty: 'Easy',
+      estimatedCO2: Math.max(1.2, Math.random() * 2.5), // Much lower CO2
+      ecoScore: 88 + Math.floor(Math.random() * 12), // High eco score
+      nutritionHighlights: [
+        'High in plant protein',
+        'Rich in fiber',
+        'Low carbon footprint',
+        'Nutrient-dense',
+        'Heart-healthy'
       ],
-      cookingTime: '20-30 minutes',
-      servings: 2,
-      estimatedCO2: Math.max(1.5, Math.random() * 3), // Much lower CO2
-      ecoScore: 85 + Math.floor(Math.random() * 15) // High eco score
+      healthBenefits: [
+        'Supports sustainable eating',
+        'Provides complete nutrition',
+        'Environmentally friendly',
+        'Budget-friendly ingredients'
+      ]
     }
   }
 
@@ -615,10 +755,63 @@ const AddMeal = () => {
                         </span>
                       </div>
                       <p className="text-sm text-green-700 mb-3">{ecoWarningData.suggestedRecipe.description}</p>
-                      <div className="flex items-center space-x-4 text-xs text-green-600">
-                        <span>🕒 {ecoWarningData.suggestedRecipe.cookingTime}</span>
-                        <span>👥 {ecoWarningData.suggestedRecipe.servings} servings</span>
+
+                      {/* Recipe Details */}
+                      <div className="grid grid-cols-2 gap-4 mb-3">
+                        <div className="text-xs text-green-600">
+                          <div className="flex items-center space-x-1 mb-1">
+                            <span>🕒</span>
+                            <span>Prep: {ecoWarningData.suggestedRecipe.prepTime}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span>⏱️</span>
+                            <span>Cook: {ecoWarningData.suggestedRecipe.cookingTime}</span>
+                          </div>
+                        </div>
+                        <div className="text-xs text-green-600">
+                          <div className="flex items-center space-x-1 mb-1">
+                            <span>👥</span>
+                            <span>{ecoWarningData.suggestedRecipe.servings} servings</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <span>📊</span>
+                            <span>{ecoWarningData.suggestedRecipe.difficulty}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Key Ingredients Preview */}
+                      <div className="mb-3">
+                        <h6 className="text-xs font-medium text-green-800 mb-1">Key Ingredients:</h6>
+                        <div className="flex flex-wrap gap-1">
+                          {ecoWarningData.suggestedRecipe.ingredients.slice(0, 4).map((ingredient: string, index: number) => (
+                            <span key={index} className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                              {ingredient.split('(')[0].trim()}
+                            </span>
+                          ))}
+                          {ecoWarningData.suggestedRecipe.ingredients.length > 4 && (
+                            <span className="text-xs text-green-600">+{ecoWarningData.suggestedRecipe.ingredients.length - 4} more</span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Health Benefits */}
+                      {ecoWarningData.suggestedRecipe.nutritionHighlights && (
+                        <div className="mb-3">
+                          <h6 className="text-xs font-medium text-green-800 mb-1">Health Benefits:</h6>
+                          <div className="flex flex-wrap gap-1">
+                            {ecoWarningData.suggestedRecipe.nutritionHighlights.slice(0, 3).map((benefit: string, index: number) => (
+                              <span key={index} className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                                {benefit}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between text-xs text-green-600 pt-2 border-t border-green-200">
                         <span>🌱 Eco Score: {ecoWarningData.suggestedRecipe.ecoScore}/100</span>
+                        <span>💚 {((ecoWarningData.co2 - ecoWarningData.suggestedRecipe.estimatedCO2) / ecoWarningData.co2 * 100).toFixed(0)}% less CO₂</span>
                       </div>
                     </div>
                   )}
