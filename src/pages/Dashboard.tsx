@@ -22,6 +22,7 @@ import {
   BarChart3
 } from 'lucide-react'
 import { localMealService, type MealStats, type Meal } from '../services/localMealService'
+import { localProfileService, type ExtendedUserProfile } from '../services/localProfileService'
 import AnalyticsDashboard from '../components/AnalyticsDashboard'
 
 const Dashboard = () => {
@@ -30,14 +31,37 @@ const Dashboard = () => {
   const [mealStats, setMealStats] = useState<MealStats | null>(null)
   const [recentMeals, setRecentMeals] = useState<Meal[]>([])
   const [showAnalytics, setShowAnalytics] = useState(false)
+  const [userProfile, setUserProfile] = useState<ExtendedUserProfile | null>(null)
 
-  useEffect(() => {
+  // Function to refresh data
+  const refreshData = () => {
     if (currentUser) {
       const stats = localMealService.getUserStats(currentUser.uid)
       const meals = localMealService.getUserMeals(currentUser.uid).slice(0, 3) // Get 3 most recent
+      const profile = localProfileService.getUserProfile(currentUser.uid)
+
       setMealStats(stats)
       setRecentMeals(meals)
+      setUserProfile(profile)
+
+      console.log('📊 Dashboard data refreshed - CO2 Saved:', profile?.stats?.totalCO2Saved || 0)
     }
+  }
+
+  useEffect(() => {
+    refreshData()
+  }, [currentUser])
+
+  // Refresh data when component becomes visible (user returns from other pages)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refreshData()
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
   }, [currentUser])
 
 
@@ -237,7 +261,7 @@ const Dashboard = () => {
               <StatCard
                 icon={TreePine}
                 title="CO₂ Saved"
-                value={mealStats.todayCO2.toFixed(1)}
+                value={(userProfile?.stats?.totalCO2Saved || 0).toFixed(1)}
                 unit="kg"
                 trend={mealStats.weeklyTrend.co2Change}
                 color="green"
@@ -245,7 +269,7 @@ const Dashboard = () => {
               <StatCard
                 icon={Droplets}
                 title="Water Saved"
-                value={mealStats.totalWater.toFixed(0)}
+                value={(userProfile?.stats?.totalWaterSaved || 0).toFixed(0)}
                 unit="liters"
                 trend={mealStats.weeklyTrend.waterChange}
                 color="blue"
