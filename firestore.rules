@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read access to challenges for all users (public challenges)
+    match /challenges/{challengeId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    // Allow users to read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Allow authenticated users to read/write challenge participations
+    match /challengeParticipations/{participationId} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // Allow authenticated users to read/write meals
+    match /meals/{mealId} {
+      allow read, write: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+    }
+    
+    // Allow authenticated users to read/write recipes
+    match /recipes/{recipeId} {
+      allow read: if true; // Public recipes
+      allow write: if request.auth != null;
+    }
+    
+    // Allow authenticated users to read/write food items
+    match /foods/{foodId} {
+      allow read: if true; // Public food database
+      allow write: if request.auth != null;
+    }
+    
+    // For development only - uncomment to allow all operations
+    // Remove this in production!
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
