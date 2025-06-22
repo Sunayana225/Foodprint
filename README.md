@@ -1,12 +1,10 @@
 # 🌱 FoodPrint - Track Your Food's Environmental Impact
+**Preview**
+foodprint-five.vercel.app  
 
 ## � Overview
 
 FoodPrint is a modern, interactive web application designed to help users track and understand the environmental impact of their food choices. By providing detailed metrics on carbon footprint, water usage, and land use for various food items, FoodPrint empowers users to make more sustainable and eco-friendly dietary decisions.
-**Preview**
-foodprint-five.vercel.app  
-
-![FoodPrint App](![image](https://github.com/user-attachments/assets/9c209a72-662e-408b-956b-17ee00040ad3))
 
 ## 🌍 Why FoodPrint?
 
